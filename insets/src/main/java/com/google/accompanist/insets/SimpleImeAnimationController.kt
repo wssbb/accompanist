@@ -331,6 +331,14 @@ internal class SimpleImeAnimationController {
         // Store the current WindowInsetsAnimationController
         insetsAnimationController = controller
 
+        insetTo(
+            if (isImeShownAtStart) {
+                controller.shownStateInsets.bottom
+            } else {
+                controller.hiddenStateInsets.bottom
+            }
+        )
+
         // Call any pending callback
         pendingRequestOnReady?.invoke(controller)
         pendingRequestOnReady = null
