@@ -14,17 +14,24 @@
  * limitations under the License.
  */
 
-@file:Suppress("DEPRECATION")
-
 package com.google.accompanist.sample.insets
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.gestures.LocalOverScrollConfiguration
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.MaterialTheme
@@ -32,6 +39,7 @@ import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -43,19 +51,15 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 import com.google.accompanist.insets.ExperimentalAnimatedInsets
-import com.google.accompanist.insets.LocalWindowInsets
-import com.google.accompanist.insets.ProvideWindowInsets
-import com.google.accompanist.insets.navigationBarsWithImePadding
 import com.google.accompanist.insets.rememberImeNestedScrollConnection
-import com.google.accompanist.insets.rememberInsetsPaddingValues
 import com.google.accompanist.insets.ui.Scaffold
-import com.google.accompanist.insets.ui.TopAppBar
+import com.google.accompanist.insets.ui.TopAppBarContent
+import com.google.accompanist.insets.ui.TopAppBarSurface
 import com.google.accompanist.sample.AccompanistSampleTheme
 import com.google.accompanist.sample.R
 import com.google.accompanist.sample.randomSampleImageUrl
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
-@OptIn(ExperimentalAnimatedInsets::class)
 class ImeAnimationSample : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,17 +69,15 @@ class ImeAnimationSample : ComponentActivity() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
         setContent {
-            // Update the system bars to be translucent
-            val systemUiController = rememberSystemUiController()
-            val useDarkIcons = MaterialTheme.colors.isLight
-            SideEffect {
-                systemUiController.setSystemBarsColor(Color.Transparent, darkIcons = useDarkIcons)
-            }
-
             AccompanistSampleTheme {
-                ProvideWindowInsets(windowInsetsAnimationsEnabled = true) {
-                    Sample()
+                // Update the system bars to be translucent
+                val systemUiController = rememberSystemUiController()
+                val useDarkIcons = MaterialTheme.colors.isLight
+                SideEffect {
+                    systemUiController.setSystemBarsColor(Color.Transparent, darkIcons = useDarkIcons)
                 }
+
+                Sample()
             }
         }
     }
@@ -83,22 +85,26 @@ class ImeAnimationSample : ComponentActivity() {
 
 private val listItems = List(40) { randomSampleImageUrl(it) }
 
-@OptIn(ExperimentalAnimatedInsets::class)
+@OptIn(ExperimentalAnimatedInsets::class, ExperimentalFoundationApi::class)
 @Composable
 private fun Sample() {
     Scaffold(
         topBar = {
             // We use TopAppBar from accompanist-insets-ui which allows us to provide
             // content padding matching the system bars insets.
-            TopAppBar(
-                title = { Text(stringResource(R.string.insets_title_imeanim)) },
+            TopAppBarSurface(
                 backgroundColor = MaterialTheme.colors.surface,
-                contentPadding = rememberInsetsPaddingValues(
-                    LocalWindowInsets.current.statusBars,
-                    applyBottom = false,
-                ),
-                modifier = Modifier.fillMaxWidth(),
-            )
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                TopAppBarContent(
+                    title = { Text(stringResource(R.string.insets_title_imeanim)) },
+                    modifier = Modifier.windowInsetsPadding(
+                        WindowInsets.systemBars.only(
+                            WindowInsetsSides.Horizontal + WindowInsetsSides.Top
+                        )
+                    )
+                )
+            }
         },
         bottomBar = {
             Surface(elevation = 1.dp) {
@@ -109,20 +115,24 @@ private fun Sample() {
                     placeholder = { Text(text = "Watch me animate...") },
                     modifier = Modifier
                         .fillMaxWidth()
+                        .navigationBarsPadding()
+                        .imePadding()
                         .padding(horizontal = 16.dp, vertical = 8.dp)
-                        .navigationBarsWithImePadding()
                 )
             }
         },
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier.fillMaxSize(),
+        contentPadding = WindowInsets.systemBars
+            .only(WindowInsetsSides.Horizontal)
+            .asPaddingValues()
     ) { contentPadding ->
-        Column {
+        // Disable over-scrolling, since it interacts strangely with controlling the IME
+        CompositionLocalProvider(LocalOverScrollConfiguration provides null) {
             // We apply the contentPadding passed to us from the Scaffold
             LazyColumn(
                 contentPadding = contentPadding,
                 reverseLayout = true,
                 modifier = Modifier
-                    .weight(1f)
                     .nestedScroll(connection = rememberImeNestedScrollConnection())
             ) {
                 items(listItems) { imageUrl ->
