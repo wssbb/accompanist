@@ -230,6 +230,8 @@ internal class SimpleImeAnimationController {
         // Cancel the current spring animation
         currentSpringAnimation?.cancel()
 
+        pendingRequestOnReady = null
+
         reset()
     }
 
@@ -289,22 +291,16 @@ internal class SimpleImeAnimationController {
         val shown = controller.shownStateInsets.bottom
         val hidden = controller.hiddenStateInsets.bottom
 
-        // If we have a velocity, we can use it's direction to determine
-        // the visibility. Upwards == visible
-        if (velocityY != null) {
-            val flingDistance = calculateFlingDistance(velocityY)
-            // If the velocity would cause a fling distance which covers the IME height,
-            // fling...
-            if (flingDistance > abs(shown - hidden)) {
+        when {
+            // If we have a velocity, we can use it's direction to determine
+            // the visibility. Upwards == visible
+            velocityY != null && abs(velocityY) > 1f -> {
                 animateImeToVisibility(
                     visible = velocityY < 0,
-                    velocityY = velocityY
+                    velocityY = velocityY,
+                    onFinished = onFinished
                 )
-                return
             }
-        }
-
-        when {
             // The current inset matches either the shown/hidden inset, finish() immediately
             current == shown -> {
                 controller.finish(true)
@@ -356,8 +352,6 @@ internal class SimpleImeAnimationController {
 
         currentSpringAnimation?.cancel()
         currentSpringAnimation = null
-
-        pendingRequestOnReady = null
     }
 
     /**
@@ -392,7 +386,7 @@ internal class SimpleImeAnimationController {
             stiffness = SpringForce.STIFFNESS_MEDIUM
         }.apply {
             if (velocityY != null) {
-                setStartVelocity(velocityY)
+                setStartVelocity(-velocityY)
             }
             addEndListener { anim, _, _, velocity ->
                 if (anim == currentSpringAnimation) {
@@ -400,13 +394,9 @@ internal class SimpleImeAnimationController {
                 }
                 // Once the animation has ended, finish the controller
                 finish()
-                onFinished?.invoke(velocity)
+                onFinished?.invoke(-velocity)
             }
         }.also { it.start() }
-    }
-
-    private fun calculateFlingDistance(velocity: Float, friction: Float = 1.0f): Float {
-        return velocity / (friction * -4.2f)
     }
 }
 

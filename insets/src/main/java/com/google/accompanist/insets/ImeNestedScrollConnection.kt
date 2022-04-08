@@ -187,7 +187,7 @@ class ImeNestedScrollConnection(
 
         // If the fling is in a (upwards direction, and the IME is not visible)
         // start an control request with an immediate fling
-        if (scrollImeOnScreenWhenNotVisible && available.y > 0 == imeVisible) {
+        if (scrollImeOnScreenWhenNotVisible && available.y < 0 && !imeVisible) {
             return suspendCancellableCoroutine { cont ->
                 imeAnimController.startAndFling(view, available.y) { remainingVelocity ->
                     cont.resume(
