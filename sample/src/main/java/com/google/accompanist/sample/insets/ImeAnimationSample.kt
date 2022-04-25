@@ -21,11 +21,13 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.gestures.LocalOverScrollConfiguration
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imeNestedScroll
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.only
@@ -45,13 +47,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
-import com.google.accompanist.insets.ExperimentalAnimatedInsets
-import com.google.accompanist.insets.rememberImeNestedScrollConnection
 import com.google.accompanist.insets.ui.Scaffold
 import com.google.accompanist.insets.ui.TopAppBarContent
 import com.google.accompanist.insets.ui.TopAppBarSurface
@@ -85,7 +84,7 @@ class ImeAnimationSample : ComponentActivity() {
 
 private val listItems = List(40) { randomSampleImageUrl(it) }
 
-@OptIn(ExperimentalAnimatedInsets::class, ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalLayoutApi::class)
 @Composable
 private fun Sample() {
     Scaffold(
@@ -133,7 +132,7 @@ private fun Sample() {
                 contentPadding = contentPadding,
                 reverseLayout = true,
                 modifier = Modifier
-                    .nestedScroll(connection = rememberImeNestedScrollConnection())
+                    .imeNestedScroll()
             ) {
                 items(listItems) { imageUrl ->
                     ListItem(imageUrl, Modifier.fillMaxWidth())
