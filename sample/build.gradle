@@ -44,9 +44,16 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion libs.versions.composeCompiler.get()
     }
+    buildTypes {
+        release {
+            signingConfig signingConfigs.debug
+        }
+    }
 }
 
 dependencies {
+    implementation "androidx.compose.runtime:runtime-tracing:1.0.0-alpha01"
+
     implementation project(':adaptive')
     implementation project(':drawablepainter')
     implementation project(':insets')

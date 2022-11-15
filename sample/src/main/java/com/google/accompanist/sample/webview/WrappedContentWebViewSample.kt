@@ -21,9 +21,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material.Button
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
@@ -36,9 +33,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import com.google.accompanist.web.WebView
-import com.google.accompanist.web.rememberWebViewStateWithHTMLData
 import kotlinx.coroutines.launch
 
 class WrappedContentWebViewSample : ComponentActivity() {
@@ -78,19 +72,19 @@ class WrappedContentWebViewSample : ComponentActivity() {
  */
 @Composable
 fun WebContent() {
-    val webViewState = rememberWebViewStateWithHTMLData(
-        data = "<html><head>\n" +
-            "<style>\n" +
-            "body {\n" +
-            "  background-color: #f00;\n" +
-            "}\n" +
-            "</style>\n" +
-            "</head><body><p>Hello</p></body></html>"
-    )
-    WebView(
-        state = webViewState,
-        modifier = Modifier.fillMaxWidth()
-            .wrapContentHeight()
-            .heightIn(min = 1.dp) // A bottom sheet can't support content with 0 height.
-    )
+//    val webViewState = rememberWebViewStateWithHTMLData(
+//        data = "<html><head>\n" +
+//            "<style>\n" +
+//            "body {\n" +
+//            "  background-color: #f00;\n" +
+//            "}\n" +
+//            "</style>\n" +
+//            "</head><body><p>Hello</p></body></html>"
+//    )
+//    WebView(
+//        state = webViewState,
+//        modifier = Modifier.fillMaxWidth()
+//            .wrapContentHeight()
+//            .heightIn(min = 1.dp) // A bottom sheet can't support content with 0 height.
+//    )
 }

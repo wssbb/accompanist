@@ -148,7 +148,7 @@ class WebTest {
         // Wait for the webview to load and then perform the check
         rule.waitForIdle()
         onWebView().check(webMatches(getCurrentUrl(), containsString(LINK_URL)))
-        assertThat(state.content.getCurrentUrl())
+        assertThat(state.lastLoadedUrl)
             .isEqualTo(LINK_URL)
     }
 
@@ -326,7 +326,7 @@ class WebTest {
         rule.waitForIdle()
 
         onWebView().check(webMatches(getCurrentUrl(), containsString("about:blank")))
-        assertThat(state.content.getCurrentUrl())
+        assertThat(state.lastLoadedUrl)
             .isEqualTo("about:blank")
     }
 
@@ -349,7 +349,7 @@ class WebTest {
         // Wait for the webview to load and then perform the check
         rule.waitForIdle()
         onWebView().check(webMatches(getCurrentUrl(), containsString(LINK_URL)))
-        assertThat(state.content.getCurrentUrl())
+        assertThat(state.lastLoadedUrl)
             .isEqualTo(LINK_URL)
     }
 
@@ -470,7 +470,7 @@ class WebTest {
             .perform(webClick())
 
         rule.waitUntil { navigator.canGoBack }
-        assertThat(state.content.getCurrentUrl()).isEqualTo(LINK_URL)
+        assertThat(state.lastLoadedUrl).isEqualTo(LINK_URL)
 
         navigator.navigateBack()
 
@@ -515,7 +515,7 @@ class WebTest {
         rule.waitUntil { navigator.canGoBack }
         rule.waitForIdle()
 
-        assertThat(state.content.getCurrentUrl()).isEqualTo(LINK_URL)
+        assertThat(state.lastLoadedUrl).isEqualTo(LINK_URL)
     }
 
     @Test
