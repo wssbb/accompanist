@@ -1,3 +1,5 @@
+import com.android.build.api.dsl.ManagedVirtualDevice
+
 /*
  * Copyright 2022 The Android Open Source Project
  *
@@ -70,6 +72,17 @@ android {
             includeAndroidResources = true
         }
         animationsDisabled true
+        managedDevices {
+            devices {
+                [28, 29, 31, 32].each { api ->
+                    create("api$api", ManagedVirtualDevice) {
+                        device = "Pixel 6"
+                        apiLevel = api
+                        systemImageSource = "google"
+                    }
+                }
+            }
+        }
     }
 
     sourceSets {
